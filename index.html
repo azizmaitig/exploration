@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive ECC key explorer: Fibonacci numbers as secp256k1 private keys with animated golden spiral and curve visualization." />
+  <title>Fibonacci × secp256k1 — ECC Key Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════════════════════ -->
+  <header>
+    <p class="eyebrow">Elliptic Curve Cryptography · Educational Demo</p>
+    <h1>Fibonacci × secp256k1</h1>
+    <p class="subtitle">F(n) as private keys · k·G on the Bitcoin curve</p>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CONTROLS
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="controls">
+
+    <!-- View tabs -->
+    <div class="tabs" role="tablist" aria-label="Visualization mode">
+      <button class="tab-btn active" data-view="spiral" role="tab" aria-selected="true">⊕ Spiral</button>
+      <button class="tab-btn"        data-view="curve"  role="tab" aria-selected="false">∿ Curve</button>
+      <button class="tab-btn"        data-view="table"  role="tab" aria-selected="false">≡ Table</button>
+    </div>
+
+    <!-- Count slider + number input -->
+    <div class="slider-group" aria-label="Number of Fibonacci terms">
+      <label for="count-slider">F(n) count:</label>
+      <input id="count-slider" type="range"  min="4" max="20" value="12" aria-label="Fibonacci count slider" />
+      <input id="count-input"  type="number" min="4" max="20" value="12" aria-label="Fibonacci count value"  />
+    </div>
+
+    <!-- Compute -->
+    <button id="compute-btn" class="btn-primary">⟳ Compute</button>
+
+    <!-- Legend -->
+    <div class="legend" aria-label="Color legend">
+      <span><span class="dot teal"></span> even Y (prefix 02)</span>
+      <span><span class="dot rose"></span> odd Y  (prefix 03)</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MAIN
+  ═══════════════════════════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- Security warning -->
+    <div class="warning-bar" role="alert">
+      ⚠ <strong>Security notice:</strong> Fibonacci numbers are deterministic and cryptographically weak as private keys.
+      This tool is for <em>educational and research purposes only</em> — never use predictable sequences in production.
+    </div>
+
+    <div class="workspace" style="margin-top: 18px;">
+
+      <!-- Left column: canvas / table -->
+      <div class="flex-1 flex flex-col">
+
+        <!-- Canvas view (spiral & curve share the same canvas) -->
+        <section id="canvas-section" aria-label="Visualization canvas">
+          <div class="canvas-wrap">
+            <canvas id="main-canvas" aria-label="Animated ECC visualization"></canvas>
+            <span class="canvas-hint" id="canvas-hint">GOLDEN SPIRAL · CLICK CHIPS BELOW TO SELECT</span>
+          </div>
+        </section>
+
+        <!-- Table view -->
+        <section id="table-section" class="hidden" aria-label="Key data table">
+          <table id="key-table" aria-label="Fibonacci ECC keys">
+            <thead>
+              <tr>
+                <th scope="col">Index</th>
+                <th scope="col">Fibonacci(n)</th>
+                <th scope="col">Private Key (hex)</th>
+                <th scope="col">Compressed Pubkey</th>
+                <th scope="col">Y Parity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Populated by script.js -->
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Fibonacci chips -->
+        <div id="chips" role="list" aria-label="Fibonacci key chips"></div>
+
+      </div><!-- /left column -->
+
+      <!-- Right column: detail panel (hidden until a key is selected) -->
+      <aside id="detail-panel" class="hidden" aria-label="Key detail panel">
+
+        <div class="detail-header">
+          <h3 id="detail-title">Key Detail</h3>
+          <button id="close-detail" title="Close panel" aria-label="Close detail panel">✕</button>
+        </div>
+
+        <!-- Basic info -->
+        <div class="detail-field">
+          <div class="field-label">Fibonacci Value</div>
+          <div class="field-val blue" id="d-fib">—</div>
+        </div>
+        <div class="detail-field">
+          <div class="field-label">Key Bit Length</div>
+          <div class="field-val gold" id="d-bits">—</div>
+        </div>
+
+        <!-- Private key -->
+        <p class="section-label">Private Key</p>
+        <div class="detail-field field-with-copy">
+          <div class="field-label">Hex (256-bit, mod n)</div>
+          <div class="field-val green" id="d-priv" style="padding-right:60px">—</div>
+          <button class="copy-btn" id="copy-priv-btn" aria-label="Copy private key">copy</button>
+        </div>
+
+        <!-- Public key -->
+        <p class="section-label">Public Key · k·G</p>
+        <div class="detail-field">
+          <div class="field-label">X Coordinate</div>
+          <div class="field-val dim" id="d-pubx">—</div>
+        </div>
+        <div class="detail-field">
+          <div class="field-label">Y Coordinate</div>
+          <div class="field-val dim" id="d-puby">—</div>
+        </div>
+        <div class="detail-field">
+          <div class="field-label">Y Parity</div>
+          <div class="field-val gold" id="d-parity">—</div>
+        </div>
+
+        <!-- Encodings -->
+        <p class="section-label">Encodings</p>
+        <div class="detail-field field-with-copy">
+          <div class="field-label">Compressed (33 bytes)</div>
+          <div class="field-val" id="d-comp" style="font-size:0.62rem;padding-right:60px">—</div>
+          <button class="copy-btn" id="copy-comp-btn" aria-label="Copy compressed key">copy</button>
+        </div>
+        <div class="detail-field field-with-copy">
+          <div class="field-label">Uncompressed (65 bytes)</div>
+          <div class="field-val dim" id="d-uncomp" style="font-size:0.60rem;padding-right:60px">—</div>
+          <button class="copy-btn" id="copy-uncomp-btn" aria-label="Copy uncompressed key">copy</button>
+        </div>
+
+        <div class="panel-warn">
+          ⚠ Fibonacci private keys are trivially brute-forceable. For educational use only — never deploy in any real cryptographic context.
+        </div>
+
+      </aside><!-- /detail-panel -->
+
+    </div><!-- /workspace -->
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════════ -->
+  <footer>
+    Fibonacci × secp256k1 · Educational ECC Demo · No private keys are stored or transmitted
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

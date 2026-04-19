@@ -113,6 +113,8 @@ Q   = k · G            → the PUBLIC KEY  (shared openly)
 
 The core visualization. Watch `Q = k·G` computed step by step on the real curve.
 
+![Point Multiply Demo](./assets/point-multiply.png)
+
 - **Slider k (1–100):** your private key — drag to change
 - **Animate:** auto-steps through all k values
 - **Step +1:** advance one hop at a time
@@ -143,6 +145,8 @@ Security meter shows `2²⁵⁶` — the actual key space size. For reference: m
 ### 4. 🦘 Kangaroo (Pollard's Lambda)
 
 Visualizes **Pollard's Kangaroo algorithm** — the best known method for solving ECDLP in a bounded range.
+
+![Kangaroo Algorithm Demo](./assets/kangaroo.png)
 
 **How it works:**
 
@@ -179,6 +183,8 @@ tame_start + tame_distance = k + wild_distance
 **The core of the cryptographic problem, made visual.**
 
 Fix a point Q on the curve — then watch algorithms search for the private key k such that `k·G = Q`.
+
+![ECDLP Visualizer Demo](./assets/find-k.png)
 
 **Two algorithms:**
 
@@ -280,7 +286,8 @@ index.html          Single-file app — HTML + CSS + JS, zero dependencies
 exploration/
 └── ecc-explorer/
     ├── index.html      ← The entire demo (open this)
-    └── README.md       ← This file
+    ├── README.md       ← This file
+    └── assets/         ← Screenshots and visual aids
 ```
 
 ---
