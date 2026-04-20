@@ -1,6 +1,6 @@
 # Exploration
 
-A collection of interactive cryptography and mathematics experiments.
+collection of interactive, diversified explorations combines hands-on cryptography puzzles with visual mathematics experiments, offering engaging ways to understand complex concepts through direct interaction.
 
 ## Projects
 
