@@ -1,6 +1,7 @@
 # Exploration
 
-collection of interactive, diversified explorations combines hands-on cryptography puzzles with visual mathematics experiments, offering engaging ways to understand complex concepts through direct interaction.
+-collection of interactive, diversified explorations combines cryptography  with visual mathematics experiments. 
+-engaging ways to understand complex concepts through direct interaction.
 
 ## Projects
 
